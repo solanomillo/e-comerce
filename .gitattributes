@@ -1,0 +1,25 @@
+# Forzar conversión automática de saltos de línea
+* text=auto
+
+# Mantener saltos de línea tipo LF para archivos que suelen causar problemas si se cambia a CRLF
+*.py text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.scss text eol=lf
+*.svg text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
+
+# No modificar archivos binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
