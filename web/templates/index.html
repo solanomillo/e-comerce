@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="hero-section text-center">
+    <h1 class="display-4 fw-bold">Bienvenido a nuestra tienda</h1>
+    <p class="lead">Los mejores productos al mejor precio</p>
+    <a href="#seccion-inferior" class="btn btn-primary btn-lg">Ver más</a>
+  </div>
+
+  <div id="seccion-inferior" class="container py-5">
+    {% include 'snippets/listaProducto.html' %}
+  </div>
+{% endblock %}

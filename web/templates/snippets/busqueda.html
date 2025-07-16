@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col">
+      {% if nombre and productos %}
+        <p class="mb-4">Resultados de búsqueda para: <strong>{{ nombre }}</strong></p>
+        {% include 'snippets/listaProducto.html' %}
+      {% else %}
+        <p class="text-muted">No se encontraron resultados para <strong>"{{ nombre }}"</strong>.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

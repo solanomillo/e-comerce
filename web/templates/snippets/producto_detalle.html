@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load number_filters %}
+{% load static %}
+{% block content %}
+<div class="container mt-3 mt-md-5">
+  <div class="row g-3 g-md-4">
+    <!-- Product Images - Versión responsive -->
+    <div class="col-12 col-lg-6">
+      <!-- Carousel principal -->
+      <div id="productCarousel" class="carousel slide shadow-sm rounded-3" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="0" class="active"></button>
+          <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="1"></button>
+        </div>
+        <div class="carousel-inner ratio ratio-1x1">
+          <div class="carousel-item active">
+            {% if producto.imagen %}
+            <img src="{{producto.imagen.url}}" class="d-block w-100 img-cover" alt="Product Image">
+            {% else %}
+            <img src="https://via.placeholder.com/600x600" class="d-block w-100 img-cover" alt="Placeholder">
+            {% endif %}
+          </div>
+          <div class="carousel-item">
+            {% if producto.imagen %}
+            <img src="{{producto.imagen.url}}" class="d-block w-100 img-cover" alt="Product Image">
+            {% else %}
+            <img src="https://via.placeholder.com/600x600" class="d-block w-100 img-cover" alt="Placeholder">
+            {% endif %}
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+      <!-- Thumbnails - Ocultos en móviles -->
+      <div class="row mt-3 g-2 d-none d-md-flex">
+        <div class="col-6">
+          {% if producto.imagen %}
+          <img src="{{producto.imagen.url}}" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(0)">
+          {% else %}
+          <img src="https://via.placeholder.com/300x300" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(0)">
+          {% endif %}
+        </div>
+        <div class="col-6">
+          {% if producto.imagen %}
+          <img src="{{producto.imagen.url}}" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(1)">
+          {% else %}
+          <img src="https://via.placeholder.com/300x300" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(1)">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Details - Versión responsive -->
+    <div class="col-12 col-lg-6">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body p-3 p-md-4">
+          <!-- Product Name -->
+          <h1 class="h2 h3-md mb-3">{{producto.nombre}}</h1>
+          
+          <!-- Category -->
+          <p class="text-muted mb-2 mb-md-3">
+            <a href="{% url 'web:producto_categoria' producto.id %}" class="text-decoration-none">
+              <i class="fas fa-tag me-1"></i> {{producto.categoria}}
+            </a>
+          </p>
+
+          <!-- Price -->
+          <h3 class="h4 text-success mb-3 mb-md-4">{{producto.precio|format_price}}</h3>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <h5 class="h6 text-muted">Descripción:</h5>
+            <p class="mb-0">{{producto.descripcion}}</p>
+          </div>
+
+          <!-- Add to Cart Form -->
+          <form action="#" method="post" class="mb-4">
+            {% csrf_token %}
+            
+            <!-- Quantity Selector -->
+            <div class="mb-4">
+              <label class="form-label">Cantidad:</label>
+              <div class="input-group" style="max-width: 150px">
+                <button class="btn btn-outline-secondary" type="button" id="decrement">-</button>
+                <input type="number" name="cantidad" class="form-control text-center" value="1" min="1" readonly>
+                <button class="btn btn-outline-secondary" type="button" id="increment">+</button>
+              </div>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+              <i class="fas fa-shopping-cart me-2"></i> Agregar al Carrito
+            </button>
+            
+            <!-- Botón "Seguir Comprando" añadido aquí -->
+            <a href="{% url 'web:index' %}" class="btn btn-outline-secondary w-100">
+              <i class="fas fa-arrow-left me-2"></i> Seguir Comprando
+            </a>
+          </form>
+
+          <!-- Product Meta -->
+          <div class="border-top pt-3">
+            <!-- Puedes agregar metadatos adicionales aquí -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

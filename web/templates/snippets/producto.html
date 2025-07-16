@@ -1,0 +1,33 @@
+{% load number_filters %}
+<div class="card h-100 shadow-sm">
+
+  {% if producto.imagen %}
+  <img src="{{ producto.imagen.url }}" alt="{{ product.nombre }}" class="card-img-top img-fluid" style="height: 300px; object-fit: cover;">
+  {% endif %}
+  
+  <div class="card-body d-flex flex-column">
+    <h5 class="card-title">{{ producto.nombre }}</h5>
+    <p class="card-text flex-grow-1">{{ producto.descripcion }}</p>
+    
+    <!-- Sección de precio -->
+    <div class="mb-3">
+      <h4 class="text-success fw-bold">{{ producto.precio|format_price }}</h4>     
+    </div>
+    
+    <!-- Botones con separación -->
+    <div class="d-flex justify-content-between mt-auto">
+      <!-- Botón Detalles -->
+      <a href="{% url 'web:producto_detalle' producto.id %}" class="btn btn-outline-primary me-2">  <!-- ← me-2 = margen derecho -->
+        <i class="fas fa-info-circle"></i> Detalles
+      </a>
+      
+      <!-- Espacio flexible entre botones (opcional) -->
+      <div class="flex-grow-1"></div>
+      
+      <!-- Botón Carrito -->
+      <a href="" class="btn btn-success flex-grow-1" title="Agregar al carrito">
+        <i class="fas fa-cart-plus"></i> Agregar
+      </a>
+    </div>
+  </div>
+</div>

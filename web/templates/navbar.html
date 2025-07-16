@@ -1,0 +1,85 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'web:index' %}">MODA URBANA</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <!-- Elementos de la izquierda -->
+          
+          <ul class="navbar-nav me-auto">  <!-- me-auto empuja lo siguiente a la derecha -->            
+                <li class="nav-item dropdown">                
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Categorias
+                  </a>
+                  <ul class="dropdown-menu">
+                    {% for categoria in categorias%}
+                      <li>
+                        <a class="dropdown-item" href="{% url 'web:producto_categoria' categoria.id %}">
+                            {{ categoria.nombre}}
+                        </a>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </li>                                  
+          </ul>
+           <div class="flex-grow-1 d-flex align-items-center mx-2">
+            <form class="w-100" role="search" action="{% url 'web:productos_por_nombre' %}" method="POST">
+                {% csrf_token %}
+                <div class="input-group input-group-sm">
+                <input type="search" class="form-control" placeholder="Buscar..." name="nombre" aria-label="Buscar">
+                <button class="btn btn-outline-light" type="submit">
+                <i class="fas fa-search"></i>
+                 </button>
+                 </div>
+            </form>
+            </div>
+ 
+
+          
+          
+          <!-- Elementos de la derecha -->
+          <ul class="navbar-nav">            
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fa-solid fa-credit-card"></i>
+                Métodos de Pago
+            </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                <span class="fa-solid fa-shipping-fast"></span>
+                Mis Ordenes
+            </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                <span class="fa-solid fa-location-arrow"></span>
+                Mis Direcciones
+            </a>
+            {% include 'carrito.html' %}
+            </li>            
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">
+                          <span class="fa-solid fa-sign-in-alt"></span>
+                          Salir
+                      </a>
+                  </li>
+             
+                  <li class="nav-item">
+                      <a class="nav-link {% if request.path == '/login/' %}active{% endif %}" href="#">
+                          <span class="fa-solid fa-user"></span>
+                          Login
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link {% if request.path == '/registro/' %}active{% endif %}" href="">
+                          <span class="fa-solid fa-user"></span>
+                          Registro
+                      </a>
+                  </li>                          
+          </ul>
+      </div>
+  </div>
+</nav>
