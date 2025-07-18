@@ -1,45 +1,44 @@
+{% load number_filters %}
 <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdownCart" role="button" 
        data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fas fa-shopping-cart"></i>  
-        {% if cart and cart.cartproduct_set.exists %}
-        <span class="badge bg-danger">{{ cart.get_total_quantity }}</span>
+        {% if cart_items %}
+        <span class="badge bg-danger">{{ cart_total_quantity }}</span>
         {% endif %}
     </a>
 
     <ul class="dropdown-menu dropdown-menu-end p-3" style="min-width: 300px;">
-        {% if cart and cart.cartproduct_set.exists %}
+        {% if cart_items %}
             <li class="mb-2"><h6>Tus productos</h6></li>
-            {% for item in cart.cartproduct_set.all %}
-                {% with producto=item.producto %}
+            {% for item in cart.items %}
                 <li class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center">
-                        {% if producto.imagen %}
-                        <img src="{{ producto.imagen.url }}" alt="{{ producto.titulo }}" style="width: 40px; height: 40px; object-fit: cover;" class="me-2 rounded">
+                        {% if item.imagen %}
+                            <img src="{{ item.imagen }}" alt="{{ item.nombre }}" style="width: 40px; height: 40px; object-fit: cover;" class="me-2 rounded">
                         {% endif %}
                         <div>
-                            <div class="fw-bold">{{ producto.titulo }}</div>
+                            <div class="fw-bold">{{ item.nombre }}</div>
                             <small class="text-muted">
-                                ${{ producto.precio }} x {{ item.cantidad }}
+                                {{ item.precio|format_price }} x {{ item.cantidad }}
                             </small>
                         </div>
                     </div>
                     <div>
-                        <a href="{% url 'cart:eliminar' producto.slug %}" class="text-danger">
+                        <a href="{% url 'web:eliminar_producto' item.producto_id %}" class="text-danger">
                             <i class="fas fa-trash-alt"></i>
                         </a>
                     </div>
                 </li>
-                {% endwith %}
             {% endfor %}
             <li class="border-top pt-2 mt-2">
                 <div class="d-flex justify-content-between fw-bold">
                     <span>Total:</span>
-                    <span>${{ cart.subtotal }}</span>
+                    <span>{{ cart_total_price|format_price }}</span>
                 </div>
             </li>
             <li class="d-grid gap-2 mt-3">
-                <a href="#" class="btn btn-primary btn-sm">
+                <a href="{% url 'web:carrito' %}" class="btn btn-primary btn-sm">
                     <i class="fas fa-shopping-bag me-1"></i> Ver carrito
                 </a>                
             </li>

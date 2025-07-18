@@ -81,7 +81,7 @@
           </div>
 
           <!-- Add to Cart Form -->
-          <form action="#" method="post" class="mb-4">
+          <form action="{% url 'web:agregar_producto' producto.id %}" method="POST" class="mb-4">
             {% csrf_token %}
             
             <!-- Quantity Selector -->
@@ -89,7 +89,7 @@
               <label class="form-label">Cantidad:</label>
               <div class="input-group" style="max-width: 150px">
                 <button class="btn btn-outline-secondary" type="button" id="decrement">-</button>
-                <input type="number" name="cantidad" class="form-control text-center" value="1" min="1" readonly>
+                <input type="text" name="cantidad" class="form-control text-center" value="1" min="1" readonly>
                 <button class="btn btn-outline-secondary" type="button" id="increment">+</button>
               </div>
             </div>

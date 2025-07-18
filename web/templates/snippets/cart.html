@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load number_filters %}
+{% block content %}
+<div class="container my-3 my-md-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-3 mb-md-4"><i class="fas fa-shopping-cart me-2"></i>Tu Carrito de Compras</h2>
+
+            {% if cart_items %}
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Imagen</th>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart.items %}                               
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <img src="{% if item.imagen %}{{ item.imagen }}{% endif %}" 
+                                            alt="{{ item.nombre }}" class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;">
+                                    </td>
+                                    <td>
+                                        <h6 class="mb-1">
+                                            <a href="#" class="text-decoration-none">
+                                                {{ item.nombre }}
+                                            </a>
+                                        </h6>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="prod-li-qnt-wrap">
+                                            <p class="qnt-wrap prod-li-qnt d-flex align-items-center justify-content-center">
+                                                <a href="#" class="qnt-minus prod-li-minus btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-minus"></i>
+                                                </a>
+                                                <input type="#" class="form-control text-center mx-2" 
+                                                    value="{{item.cantidad}}" style="width: 50px;" readonly>
+                                                <a href="#" class="qnt-plus prod-li-plus btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-plus"></i>
+                                                </a>
+                                            </p>
+                                        </div>                                    
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="h5 text-success">{{ item.precio|format_price }}</span>                                        
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'web:eliminar_producto' item.producto_id %}" 
+                                        class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <!-- Pie de tabla con total general - Versión corregida -->
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-end"><strong>Total General:</strong></td>
+                                <td class="text-center h5 text-success">{{cart_total_price|format_price}}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Versión móvil -->
+                <div class="d-block d-md-none">
+                    {% for item in cart.items %}                        
+                        <div class="list-group-item mb-3 p-3 border rounded">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="{% if item.imagen %}{{ item.imagen }}{% endif %}" 
+                                        alt="{{ item.nombre }}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <a href="{% url 'web:producto_detalle' item.producto_id %}" class="text-decoration-none">
+                                                {{ item.nombre }}
+                                            </a>
+                                        </h6>
+                                        <small class="text-muted d-block">{{ item.precio|format_price }}</small>
+                                    </div>
+                                </div>
+                                <a href="{% url 'web:eliminar_producto' item.producto_id %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                            <div class="mt-2 d-flex align-items-center justify-content-between">
+                                <span class="me-2">Cantidad:</span>
+                                <div class="prod-li-qnt-wrap">
+                                    <p class="qnt-wrap prod-li-qnt d-flex align-items-center">
+                                        <a href="" class="qnt-minus prod-li-minus btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-minus"></i>
+                                        </a>
+                                        <input type="text" class="form-control text-center mx-2" 
+                                               value="{{item.cantidad}}" style="width: 50px;" readonly>
+                                        <a href="#" class="qnt-plus prod-li-plus btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>                            
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Total general para móvil -->
+                <div class="card mt-3 d-md-none">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <strong>Total General:</strong>
+                        <span class="h5 text-success">{{cart_total_price|format_price}}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column flex-md-row justify-content-between mt-4">
+                    <a href="{% url 'web:index' %}" class="btn btn-outline-primary mb-3 mb-md-0">
+                        <i class="fas fa-arrow-left me-2"></i> Seguir Comprando
+                    </a>
+                    <div class="d-flex flex-column flex-md-row">
+                        <a href="{% url 'web:vaciar_carrito' %}" class="btn btn-outline-danger mb-2 mb-md-0 me-md-3">
+                            <i class="fas fa-trash-alt me-2"></i> Vaciar Carrito
+                        </a>
+                        <a href="#" class="btn btn-success">
+                            <i class="fas fa-credit-card me-2"></i> Comprar Ahora
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Carrito vacío -->
+                <div class="text-center py-5 empty-cart">
+                    <div class="mb-4">
+                        <i class="fas fa-shopping-cart fa-5x text-muted"></i>
+                    </div>
+                    <h3 class="mb-3">Tu carrito está vacío</h3>
+                    <p class="text-muted mb-4">Parece que aún no has agregado productos a tu carrito</p>
+                    <a href="{% url 'web:index' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-store me-2"></i> Comprar Ahora
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
