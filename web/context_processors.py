@@ -19,11 +19,9 @@ def year_context(request):
 
 def cart_context(request):
     cart = Cart(request)
-    
     return {
-        'cart': cart,  # Objeto Cart completo para acceder a todos sus métodos
-        'cart_items': cart.items(),  # Lista de items en el carrito
-        'cart_total_quantity': sum(int(item['cantidad']) for item in cart.items()),
-        'cart_total_price': cart.montoTotal,  # Usamos el montoTotal que ya calcula la clase Cart
-        'cart_subtotal': cart.montoTotal  # Alias para compatibilidad (opcional)
+        'cart': cart,
+        'cart_items': list(cart.items()),  # Convertimos a lista para evitar problemas
+        'cart_total_quantity': sum(item['cantidad'] for item in cart.items()),
+        'cart_total_price': cart.montoTotal,
     }

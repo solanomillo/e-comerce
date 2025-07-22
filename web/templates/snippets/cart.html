@@ -38,12 +38,12 @@
                                     <td class="text-center">
                                         <div class="prod-li-qnt-wrap">
                                             <p class="qnt-wrap prod-li-qnt d-flex align-items-center justify-content-center">
-                                                <a href="#" class="qnt-minus prod-li-minus btn btn-sm btn-outline-secondary">
+                                                <a href="{% url 'web:disminuir_producto' item.producto_id %}" class="qnt-minus prod-li-minus btn btn-sm btn-outline-secondary">
                                                     <i class="fas fa-minus"></i>
                                                 </a>
-                                                <input type="#" class="form-control text-center mx-2" 
-                                                    value="{{item.cantidad}}" style="width: 50px;" readonly>
-                                                <a href="#" class="qnt-plus prod-li-plus btn btn-sm btn-outline-secondary">
+                                                <input type="text" class="form-control text-center mx-2" 
+                                                    value="{{ item.cantidad }}" style="width: 50px;" readonly>
+                                                <a href="{% url 'web:aumentar_producto' item.producto_id %}" class="qnt-plus prod-li-plus btn btn-sm btn-outline-secondary">
                                                     <i class="fas fa-plus"></i>
                                                 </a>
                                             </p>
@@ -96,12 +96,12 @@
                                 <span class="me-2">Cantidad:</span>
                                 <div class="prod-li-qnt-wrap">
                                     <p class="qnt-wrap prod-li-qnt d-flex align-items-center">
-                                        <a href="" class="qnt-minus prod-li-minus btn btn-sm btn-outline-secondary">
+                                       <a href="{% url 'web:disminuir_producto' item.producto_id %}" class="qnt-minus prod-li-minus btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-minus"></i>
                                         </a>
                                         <input type="text" class="form-control text-center mx-2" 
-                                               value="{{item.cantidad}}" style="width: 50px;" readonly>
-                                        <a href="#" class="qnt-plus prod-li-plus btn btn-sm btn-outline-secondary">
+                                            value="{{ item.cantidad }}" style="width: 50px;" readonly>
+                                        <a href="{% url 'web:aumentar_producto' item.producto_id %}" class="qnt-plus prod-li-plus btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-plus"></i>
                                         </a>
                                     </p>

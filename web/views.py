@@ -59,7 +59,10 @@ def productoDetalle(request, producto_id):
 
 """ VISTAS PARA EL CARRITO DE COMPRAS """
 def carrito(request):
-    return render(request, 'snippets/cart.html',{       
+    cart = Cart(request)
+    return render(request, 'snippets/cart.html', {
+        'cart_items': cart.items(),
+        'cart_total_price': cart.montoTotal
     })
     
 
@@ -78,7 +81,6 @@ def agregarProducto(request, producto_id):
     if 'carrito' in request.META.get('HTTP_REFERER', ''):
             return redirect('web:carrito')
     return redirect(request.META.get('HTTP_REFERER', 'web:index'))
-    return redirect('web:index')
 
 
 def eliminarProducto(request, producto_id):
@@ -99,3 +101,31 @@ def vaciarCarrito(request):
     cart = Cart(request)  
     cart.clear()
     return render(request, 'snippets/cart.html')
+
+def aumentar_producto(request, producto_id):
+    """ Aumentar la cantidad de un producto en 1 """
+    producto = Producto.objects.get(pk=producto_id)
+    cart = Cart(request)
+    cart.add(producto, 1)  # Aumenta en 1 la cantidad
+    
+    if 'carrito' in request.META.get('HTTP_REFERER', ''):
+        return redirect('web:carrito')
+    return redirect(request.META.get('HTTP_REFERER', 'web:index'))
+
+def disminuir_producto(request, producto_id):
+    """ Disminuir la cantidad de un producto en 1 """
+    producto = Producto.objects.get(pk=producto_id)
+    cart = Cart(request)
+    
+    # Buscar el producto en el carrito
+    for item in cart.items():
+        if item['producto_id'] == producto_id:
+            if item['cantidad'] > 1:
+                cart.add(producto, -1)  # Disminuir en 1
+            else:
+                cart.delete(producto)  # Eliminar si la cantidad sería 0
+            break
+    
+    if 'carrito' in request.META.get('HTTP_REFERER', ''):
+        return redirect('web:carrito')
+    return redirect(request.META.get('HTTP_REFERER', 'web:index'))
