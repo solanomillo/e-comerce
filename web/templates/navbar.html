@@ -61,20 +61,20 @@
             {% include 'carrito.html' %}
             </li>            
                   <li class="nav-item">
-                      <a class="nav-link" href="#">
+                      <a class="nav-link" href="{% url 'web:logout' %}">
                           <span class="fa-solid fa-sign-in-alt"></span>
                           Salir
                       </a>
                   </li>
              
                   <li class="nav-item">
-                      <a class="nav-link {% if request.path == '/login/' %}active{% endif %}" href="#">
+                      <a class="nav-link {% if request.path == '/login/' %}active{% endif %}" href="{% url 'web:login' %}">
                           <span class="fa-solid fa-user"></span>
                           Login
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link {% if request.path == '/registro/' %}active{% endif %}" href="">
+                      <a class="nav-link {% if request.path == '/registro/' %}active{% endif %}" href="{% url 'web:registro' %}">
                           <span class="fa-solid fa-user"></span>
                           Registro
                       </a>

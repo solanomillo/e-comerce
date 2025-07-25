@@ -12,9 +12,10 @@
     <link rel="stylesheet" href="{% static 'css/all.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/stilos.css' %}" />
   </head>
-  <body class="d-flex flex-column h-100">
+  <body class="d-flex flex-column h-100">    
     
     {% include 'navbar.html' %}
+    {% include "messages.html" %}
 
     <!-- Contenido principal sin container que genera márgenes -->
     <main class="flex-shrink-0">

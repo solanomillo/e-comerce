@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+</head>
+<body>
+<div class="container vh-50 d-flex mt-5 justify-content-center">
+  <div class="col-12 col-md-6">
+    <div class="card shadow-lg">
+      <div class="card-body">
+        <h2 class="text-center">Registro</h2>
+        <form action="" method="POST">
+          {% csrf_token %} 
+          {% for dato in form %}
+            <div class="form-group mb-3">
+              {{ dato.label_tag }} 
+              {{ dato }} 
+              {% if dato.errors %}
+                <div class="text-danger">{{ dato.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <hr>
+          <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

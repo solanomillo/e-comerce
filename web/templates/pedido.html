@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load number_filters %}
+{% block content %}
+<div class="container py-5">
+    {% if cart_items %}
+    <h1 class="mb-4 text-center">REGISTRO DE PEDIDO</h1>
+
+    <!-- Formulario de actualización de datos del cliente -->
+    <form action="{% url 'web:actualizar_cliente' %}" method="POST">
+    {% csrf_token %}
+    
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Información del Cliente</h2>
+            <button type="submit" class="btn btn-light btn-sm">
+                <i class="fas fa-sync-alt me-1"></i> Actualizar
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nombre" class="form-label">Nombres <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ request.user.username }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="apellido" class="form-label">Apellidos <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="apellido" name="apellido" value="{{ request.user.last_name }}" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="provincia" class="form-label">Provincia <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="provincia" name="provincia" value="{{ cliente.provincia }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="localidad" class="form-label">Localidad <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="localidad" name="localidad" value="{{ cliente.localidad }}" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="codigo_postal" class="form-label">Código Postal <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" value="{{ cliente.codigo_postal }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="direccion" class="form-label">Dirección <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="direccion" name="direccion" value="{{ cliente.direccion }}" required>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+    <!-- Resto del contenido del pedido (sin cambios) -->
+    <form method="POST" action="#">
+        {% csrf_token %}
+        <!-- Sección de Productos -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h2 class="h5 mb-0">Confirmación de Productos</h2>
+            </div>
+            <div class="card-body">
+                {% for value in request.session.cart.values %}
+                <div class="row mb-3 border-bottom pb-3 align-items-center">
+                    <div class="col-md-2">
+                        <img src="{{value.imagen}}" alt="{{value.nombre}}" class="img-fluid rounded">
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="mb-1">{{value.nombre}}</h5>
+                        <small class="text-muted">{{value.categoria}}</small>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="mb-0">Precio: <span class="fw-bold text-success">{{value.precio|format_price }}</span></p>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <button class="btn btn-outline-secondary" type="submit" name="decrease" value="{{value.id}}">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="text" class="form-control text-center" value="{{value.cantidad}}" readonly>
+                            <button class="btn btn-outline-secondary" type="submit" name="increase" value="{{value.id}}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="mb-0">Total: <span class="fw-bold text-success">{{value.subtotal|format_price }}</span></p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Resumen del Pedido -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Total del Pedido</h3>
+                    <h3 class="mb-0 text-success">{{request.session.cartMontoTotal|format_price }}</h3>
+            </div>
+        </div>
+        
+        <!-- Botones de Acción -->
+        <div class="d-grid gap-3">
+            <button class="btn btn-success btn-lg" type="submit" name="action" value="confirm_order">
+                <i class="fas fa-check-circle me-2"></i> Confirmar Pedido
+            </button>
+            <a href="#" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i> Continuar Comprando
+            </a>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        No hay ningun Pedido registrado. Por favor, agrega productos al carrito para proceder.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
