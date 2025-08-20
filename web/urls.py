@@ -4,10 +4,10 @@ from . import views
 app_name = 'web'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.ProductoListView.as_view(), name='index'),
     path('categoria/<int:categoria_id>/', views.producto_categoria, name='producto_categoria'),
-    path('buscar/', views.productosPorNombre, name='productos_por_nombre'),
-    path('producto/<int:producto_id>/', views.productoDetalle, name= 'producto_detalle'),
+    path('buscar/', views.busquedaProductoNombre, name='productos_por_nombre'),
+    path('producto/<pk>/', views.ProductoDetailView.as_view(), name= 'producto_detalle'),
     path('carrito/', views.carrito, name='carrito'),
     path('agregar/<int:producto_id>', views.agregarProducto, name='agregar_producto'),
     path('eliminar/<int:producto_id>', views.eliminarProducto, name='eliminar_producto'),
@@ -18,5 +18,6 @@ urlpatterns = [
     path('registro/', views.registro, name='registro'),
     path('logout/', views.logout_view, name='logout'),
     path('pedido/', views.registrarPedido, name='registrar_pedido'),
-    path('actualizar_cliente/', views.actualizarUsuario, name='actualizar_cliente'),
+    path('confirmar_pedido/', views.confirmarPedido, name='confirmar_pedido'),
+    path('gracias/', views.gracias, name='gracias')
 ]

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from autoslug import AutoSlugField
 
 # Create your models here.
 class Categoria(models.Model):
@@ -17,7 +18,8 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=9, decimal_places=2)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     imagen = models.ImageField(upload_to='productos', blank=True)
-    
+    slug = AutoSlugField(populate_from='nombre', null=False, blank=False, unique=True)
+        
     def __str__(self):
         return self.nombre
 

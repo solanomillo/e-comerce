@@ -25,7 +25,7 @@
       <div class="flex-grow-1"></div>
       
       <!-- Botón Carrito -->
-      <a href="{% url 'web:agregar_producto' producto.id %}" class="btn btn-success flex-grow-1" title="Agregar al carrito">
+      <a href="{% url 'web:agregar_producto' producto.id %}?nombre={{ nombre }}" class="btn btn-success flex-grow-1" title="Agregar al carrito">
         <i class="fas fa-cart-plus"></i> Agregar
       </a>
     </div>

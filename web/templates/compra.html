@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5">Detalle de Pedido {{pedido.nro_pedido}}</h1>
+        <span class="badge bg-secondary fs-6">Fecha: {{pedido.fecha_pedido|date:"d/m/Y"}}</span>
+    </div>
+
+    <!-- Lista de productos -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h2 class="h5 mb-0">Productos del Pedido</h2>
+        </div>
+        <div class="card-body">
+            {% for detalle in pedido.detalles.all %}
+            <div class="row mb-4 border-bottom pb-3 align-items-center">
+                <!-- Imagen del producto -->
+                <div class="col-md-2">
+                    <img src="{{detalle.producto.imagen.url}}" alt="{{detalle.producto.nombre}}" class="img-fluid rounded">
+                </div>
+                
+                <!-- Información del producto -->
+                <div class="col-md-4">
+                    <span class="badge bg-light text-success mb-2">{{detalle.producto.categoria}}</span>
+                    <h3 class="h5">{{detalle.producto.nombre}}</h3>
+                </div>
+                
+                <!-- Precio unitario -->
+                <div class="col-md-2">
+                    <p class="mb-1 text-muted">Precio unitario</p>
+                    <p class="h5 text-success">${{detalle.producto.precio}}</p>
+                </div>
+                
+                <!-- Cantidad -->
+                <div class="col-md-2">
+                    <p class="mb-1 text-muted">Cantidad</p>
+                    <div class="input-group" style="max-width: 120px;">
+                        <button class="btn btn-outline-success" type="button">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="text" class="form-control text-center" value="{{detalle.cantidad}}" readonly>
+                        <button class="btn btn-outline-success" type="button">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Subtotal -->
+                <div class="col-md-2">
+                    <p class="mb-1 text-muted">Subtotal</p>
+                    <p class="h5 text-success">${{detalle.subtotal}}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Resumen y pago -->
+    <div class="row">
+        <div class="col-md-6 offset-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0">Resumen del Pedido</h2>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5">Total</h3>
+                        <h3 class="h4 text-success">${{pedido.monto_total}}</h3>
+                    </div>
+                    
+                    <!-- Botón de PayPal -->
+                    <div class="d-grid gap-2 mt-4">
+                        {{formPaypal.render}}
+                    </div>
+                    
+                    <!-- Botón de volver -->
+                    <div class="d-grid mt-3">
+                        <a href="/" class="btn btn-outline-success">
+                            <i class="fas fa-arrow-left me-2"></i> Volver al inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

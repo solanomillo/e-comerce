@@ -1,26 +1,31 @@
-from urllib import request
+import datetime
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Cliente, Producto, Categoria
+from .models import Cliente, Producto, Categoria, Pedido, PedidoDetalle
 from .carts import Cart
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import RegistroForm
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from paypal.standard.forms import PayPalPaymentsForm
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
+
 
 # Create your views here.
-""" Vistas para mostrar el catalogo de productos"""
 
-def index(request):
-    listProductos = Producto.objects.all()
-    listCategorias = Categoria.objects.all()
+class ProductoListView(ListView):
+    """Vistas para mostrar el catalogo de productos"""
+    template_name = 'index.html'
+    queryset = Producto.objects.all()
     
-    return render(request, 'index.html', {
-        'productos': listProductos,
-        'categorias': listCategorias
-    })
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categorias'] = Categoria.objects.all()
+        context['mostrar_hero'] = True
+        return context
 
 def producto_categoria(request, categoria_id):
     """Vista para mostrar productos por categoria"""
@@ -31,13 +36,14 @@ def producto_categoria(request, categoria_id):
     
     return render(request, 'index.html',{
         'productos': listProductos,
-        'categorias': listCategorias
+        'categorias': listCategorias,
+        'mostrar_hero': False,
     })
 
 
-def productosPorNombre(request):
+def busquedaProductoNombre(request):
     """ Vista para mostrar productos por nombre"""
-    nombre = request.POST['nombre']
+    nombre = request.GET.get('nombre', '').strip()
     
     listProductos = Producto.objects.filter(nombre__icontains=nombre)
     listCategorias = Categoria.objects.all()
@@ -46,21 +52,18 @@ def productosPorNombre(request):
         'productos': listProductos,
         'categorias': listCategorias,
         'nombre': nombre,
+        'mostrar_hero': False,
     })
 
-
-def productoDetalle(request, producto_id):
+class ProductoDetailView(DetailView):
     """ Vista para mostrar el detalle de un producto """
-    #producto = Producto.objects.get(pk=producto_id)
+    model = Producto
+    template_name = 'snippets/producto_detalle.html'
     
-    producto = get_object_or_404(Producto, pk=producto_id)
-    listCategorias = Categoria.objects.all()
-    
-    return render(request, 'snippets/producto_detalle.html',{
-        'producto': producto,
-        'categorias': listCategorias
-    })
-    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categorias'] = Categoria.objects.all()
+        return context
 
 """ VISTAS PARA EL CARRITO DE COMPRAS """
 def carrito(request):
@@ -142,7 +145,7 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('/')
     
-    pagina = request.GET.get('next', None)
+    pagina = request.GET.get('next', '/')
     
     
     if request.method == 'POST':
@@ -154,7 +157,7 @@ def login_view(request):
         
         if usuario is not None:
             login(request, usuario)
-            messages.success(request, f'Bienvenido {usuario.username}')
+            messages.success(request, f'Bienvenido {usuario.first_name} {usuario.last_name}')
             # Si hay un 'next' en la URL, redirigir a esa página
             if pagina:
                 return HttpResponseRedirect(pagina)
@@ -189,7 +192,8 @@ def registro(request):
             data = dataForm.cleaned_data
             # Crear el usuario
             nuevoUsuario = User.objects.create_user(
-                username=data['nombre'],
+                username=data['email'],
+                first_name=data['nombre'],
                 last_name=data['apellido'],
                 email=data['email'],
                 password=data['password']
@@ -204,59 +208,16 @@ def registro(request):
                 codigo_postal=data['codigo_postal'],
                 direccion=data['direccion']
             )
-            messages.success(request, 'Usuario registrado correctamente')
             
             # Iniciar sesión automáticamente al usuario
             if nuevoUsuario is not None:
                 login(request, nuevoUsuario)
-                messages.success(request,f'Bienvenido {nuevoUsuario.username}')
+                messages.success(request,f'Bienvenido {nuevoUsuario.first_name} {nuevoUsuario.last_name}')
                 return redirect('/')
             
     return render(request, 'registro.html', {
         'form': dataForm
     })       
-
-
-
-
-def actualizarUsuario(request):
-    if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        apellido = request.POST.get('apellido')
-        provincia = request.POST.get('provincia')
-        localidad = request.POST.get('localidad')
-        codigo_postal = request.POST.get('codigo_postal')
-        direccion = request.POST.get('direccion')
-        
-        if not all([nombre, apellido, provincia, localidad, codigo_postal, direccion]):
-            messages.error(request, "Todos los campos son obligatorios")
-            return redirect(request.META.get('HTTP_REFERER', '/'))
-
-        try:
-            cliente = Cliente.objects.get(usuario=request.user)
-
-            # Actualizar usuario
-            user = request.user
-            user.username = nombre
-            user.last_name = apellido
-            user.save()
-
-            # Actualizar cliente
-            cliente.provincia = provincia
-            cliente.localidad = localidad
-            cliente.codigo_postal = codigo_postal
-            cliente.direccion = direccion
-            cliente.save()
-
-            messages.success(request, 'Datos actualizados correctamente')
-            return redirect('web:registrar_pedido')
-
-        except Cliente.DoesNotExist:
-            messages.error(request, 'Cliente no encontrado')
-            return redirect('/')
-
-    return redirect('/')
-
 
 
 """ VISTAS PARA EL PEDIDO """
@@ -268,7 +229,7 @@ def registrarPedido(request):
         cliente = Cliente.objects.get(usuario=request.user)
 
         dataCliente = {
-            'nombre': cliente.usuario.username,
+            'nombre': cliente.usuario.first_name,
             'apellido': cliente.usuario.last_name,
             'provincia': cliente.provincia,
             'localidad': cliente.localidad,
@@ -288,3 +249,117 @@ def registrarPedido(request):
     })
 
 
+""""Vista del método de pago"""
+@login_required(login_url='/login/')
+def confirmarPedido(request):
+    if request.method == 'POST':
+        # 1. Actualizamos el usuario
+        actUsuario = User.objects.get(pk=request.user.id)
+        actUsuario.first_name = request.POST['nombre']
+        actUsuario.last_name = request.POST['apellido']
+        actUsuario.save()
+        
+        # 2. Actualizamos el cliente
+        actCliente = Cliente.objects.get(usuario=request.user)       
+        actCliente.provincia = request.POST['provincia']
+        actCliente.localidad = request.POST['localidad']
+        actCliente.codigo_postal = request.POST['codigo_postal']
+        actCliente.direccion = request.POST['direccion']
+        actCliente.save()
+        
+        # 3. Datos del carrito y total
+        cart = request.session.get('cart')
+        monto_total = float(request.session.get('cartMontoTotal', 0))
+
+        # 4. Creamos el pedido con todo completo ANTES de guardar
+        fecha_actual = datetime.datetime.now()
+        nuevoPedido = Pedido(
+            cliente=actCliente,
+            fecha_pedido=fecha_actual,
+            monto_total=monto_total
+        )
+        nuevoPedido.save()
+
+        # 5. Generamos el nro_pedido (usando el ID generado)
+        nro_pedido = f'PED-{fecha_actual.strftime("%Y")}{nuevoPedido.id:05d}'
+        nuevoPedido.nro_pedido = nro_pedido
+        nuevoPedido.save()
+        
+        # registrar la variable de session para el pedido
+        request.session['pedidoId'] = nuevoPedido.id
+
+        # 6. Registramos los detalles del pedido
+        for key, value in cart.items():
+            producto = Producto.objects.get(pk=value['producto_id'])
+            detalle = PedidoDetalle(
+                pedido=nuevoPedido,
+                producto=producto,
+                cantidad=int(value['cantidad']),
+                subtotal=float(value['subtotal'])
+            )
+            detalle.save()
+        
+        # 7. Configuramos PayPal
+        paypal_dict = {
+            "business": "sb-ii8ew38425031@business.example.com",
+            "amount": monto_total,
+            "item_name": f'Pedido {nuevoPedido.nro_pedido} - {nuevoPedido.cliente.usuario.username}',
+            "invoice": nro_pedido,
+            "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+            "return": request.build_absolute_uri('/gracias'),
+            "cancel_return": request.build_absolute_uri('/'),
+            "custom": "premium_plan",
+        }
+        formPaypal = PayPalPaymentsForm(initial=paypal_dict)
+        
+        # limpiar el carrito después de crear el pedido
+        carrito = Cart(request)
+        carrito.clear()
+
+        return render(request, 'compra.html', {
+            'pedido': nuevoPedido,
+            'formPaypal': formPaypal,
+        })   
+
+    # Si no es POST, redirigimos o mostramos un error
+    return render(request, 'compra.html')
+
+@login_required(login_url='/login/')
+def gracias(request):
+    paypalId = request.GET.get('PayerID', None)
+    
+    if paypalId is not None:
+        pedidoId = request.session.get('pedidoId')
+        pedido = Pedido.objects.get(pk=pedidoId)
+        pedido.estado = '1'
+        pedido.save()
+    else:
+        return redirect('/')
+    return render(request,'gracias.html',{
+        'pedido': pedido 
+    })
+
+
+
+
+
+
+
+# def view_that_asks_for_money(request):
+
+#     # What you want the button to do.
+#     paypal_dict = {
+#         "business": "sb-ii8ew38425031@business.example.com",
+#         "amount": "50.00",
+#         "item_name": "producto prueba",
+#         "invoice": "50-ED50",
+#         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+#         "return": request.build_absolute_uri('/'),
+#         "cancel_return": request.build_absolute_uri('/'),
+#         "custom": "premium_plan",  # Custom command to correlate to some function later (optional)
+#     }
+
+#     # Create the instance.
+#     form = PayPalPaymentsForm(initial=paypal_dict)
+#     context = {"form": form}
+#     return render(request, "payment.html", context)

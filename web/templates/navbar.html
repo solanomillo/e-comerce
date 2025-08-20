@@ -25,7 +25,7 @@
                 </li>                                  
           </ul>
            <div class="flex-grow-1 d-flex align-items-center mx-2">
-            <form class="w-100" role="search" action="{% url 'web:productos_por_nombre' %}" method="POST">
+            <form class="w-100" role="search" action="{% url 'web:productos_por_nombre' %}" method="get">
                 {% csrf_token %}
                 <div class="input-group input-group-sm">
                 <input type="search" class="form-control" placeholder="Buscar..." name="nombre" aria-label="Buscar">

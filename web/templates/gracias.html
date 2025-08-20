@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'web:index' %}">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Compra</li>
+        </ol>
+    </nav>
+
+    <!-- Tarjeta de confirmación -->
+    <div class="card border-success mb-5">
+        <div class="card-header bg-success text-white">
+            <h1 class="h3 mb-0">¡Gracias por tu compra!</h1>
+        </div>
+        <div class="card-body text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+            </div>
+            <h2 class="card-title mb-4">Tu pedido ha sido confirmado</h2>
+            
+            <div class="alert alert-success d-inline-block text-start">
+                <h3 class="h4 mb-3">Número de Pedido: <strong>{{pedido.nro_pedido}}</strong></h3>
+                <p class="mb-0">Te enviaremos un correo electrónico con los detalles de tu compra.</p>
+            </div>
+
+            <div class="mt-5">
+                <p>Puedes ver el estado de tu pedido en cualquier momento desde tu cuenta.</p>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="{% url 'web:index' %}" class="btn btn-outline-success">
+                        <i class="fas fa-home me-2"></i>Volver al inicio
+                    </a>
+                    <!-- <a href="#" class="btn btn-success">
+                        <i class="fas fa-box-open me-2"></i>Ver mis pedidos
+                    </a> -->
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-light text-center">
+            <p class="mb-0">¿Tienes alguna pregunta? <a href="#">Contáctanos</a></p>
+        </div>
+    </div>
+
+    <!-- Información adicional opcional -->
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-shipping-fast text-success mb-3" style="font-size: 2rem;"></i>
+                    <h3 class="h5">Envío rápido</h3>
+                    <p class="text-muted">Tu pedido será procesado y enviado en 24-48 horas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-undo text-success mb-3" style="font-size: 2rem;"></i>
+                    <h3 class="h5">Devoluciones fáciles</h3>
+                    <p class="text-muted">Política de devolución de 30 días sin complicaciones</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-headset text-success mb-3" style="font-size: 2rem;"></i>
+                    <h3 class="h5">Soporte 24/7</h3>
+                    <p class="text-muted">Nuestro equipo de soporte está siempre disponible</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
