@@ -1,9 +1,44 @@
-<div class="row mt-4">
-  <h2 class="mb-3 text-center">Productos Destacados</h2>
-  {% for producto in producto_list %}
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-      {% include 'snippets/producto.html' %}
-    </div>
-  {% endfor %}
+<div id="productos-container">
+  <div class="row mt-4">
+    <h2 class="mb-3 text-center">Productos Destacados</h2>
+    {% for producto in productos %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+        {% include 'snippets/producto.html' %}
+      </div>
+    {% empty %}
+      <p class="text-center">No hay productos disponibles.</p>
+    {% endfor %}
+  </div>
+
+  {% if is_paginated %}
+    <nav aria-label="Paginación de productos">
+      <ul class="pagination justify-content-center mt-4">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link page-ajax" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+          </li>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+          {% if num == page_obj.number %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link page-ajax" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link page-ajax" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
 </div>
+
 

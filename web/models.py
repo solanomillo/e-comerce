@@ -5,6 +5,7 @@ from autoslug import AutoSlugField
 # Create your models here.
 class Categoria(models.Model):
     nombre = models.CharField(max_length=200)
+    slug = AutoSlugField(populate_from='nombre', null=False, blank=False, unique=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -12,7 +13,7 @@ class Categoria(models.Model):
     
 
 class Producto(models.Model):
-    categoria = models.ForeignKey(Categoria, on_delete=models.RESTRICT)
+    categoria = models.ForeignKey(Categoria, on_delete=models.RESTRICT, related_name='productos')
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField(null=True)
     precio = models.DecimalField(max_digits=9, decimal_places=2)
@@ -46,12 +47,16 @@ class Pedido(models.Model):
     fecha_pedido = models.DateTimeField(auto_now_add=True)
     nro_pedido = models.CharField(max_length=20, unique=True)
     monto_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    envio_total = models.DecimalField(max_digits=10, decimal_places=2, default=20000.00)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='Pendiente')
+
+    def calcular_total(self):
+        self.monto_total = self.monto_total + self.envio_total
 
     def __str__(self):
         return f'Pedido {self.id} - {self.cliente.usuario.username}'
-
-
+    
+ 
 class PedidoDetalle(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.RESTRICT, related_name='detalles')
     producto = models.ForeignKey(Producto, on_delete=models.RESTRICT)

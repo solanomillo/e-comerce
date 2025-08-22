@@ -5,9 +5,9 @@ app_name = 'web'
 
 urlpatterns = [
     path('', views.ProductoListView.as_view(), name='index'),
-    path('categoria/<int:categoria_id>/', views.producto_categoria, name='producto_categoria'),
-    path('buscar/', views.busquedaProductoNombre, name='productos_por_nombre'),
-    path('producto/<pk>/', views.ProductoDetailView.as_view(), name= 'producto_detalle'),
+    path('categoria/<slug:slug>/', views.ProductoCategoriaListView.as_view(), name='producto_categoria'),
+    path('buscar/', views.BuscarProductoListView.as_view(), name='productos_por_nombre'),
+    path('producto/<slug:slug>/', views.ProductoDetailView.as_view(), name= 'producto_detalle'),
     path('carrito/', views.carrito, name='carrito'),
     path('agregar/<int:producto_id>', views.agregarProducto, name='agregar_producto'),
     path('eliminar/<int:producto_id>', views.eliminarProducto, name='eliminar_producto'),

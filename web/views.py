@@ -19,41 +19,51 @@ from django.views.generic.detail import DetailView
 class ProductoListView(ListView):
     """Vistas para mostrar el catalogo de productos"""
     template_name = 'index.html'
+    context_object_name = 'productos'
+    paginate_by = 8
     queryset = Producto.objects.all()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categorias'] = Categoria.objects.all()
         context['mostrar_hero'] = True
         return context
 
-def producto_categoria(request, categoria_id):
-    """Vista para mostrar productos por categoria"""
-    objectsCategoria = Categoria.objects.get(pk=categoria_id)
-    listProductos = objectsCategoria.producto_set.all()
-    
-    listCategorias = Categoria.objects.all()
-    
-    return render(request, 'index.html',{
-        'productos': listProductos,
-        'categorias': listCategorias,
-        'mostrar_hero': False,
-    })
+class ProductoCategoriaListView(ListView):
+    """Vista para mostrar productos por categoria"""    
+    template_name = 'index.html'
+    paginate_by = 12
+    context_object_name = 'productos'
 
+    def get_queryset(self):
+        # Almacenamos la categoría en la instancia de la vista para reutilizarla
+        slug = self.kwargs['slug']
+        self.categoria = get_object_or_404(Categoria, slug=slug)
+        return Producto.objects.filter(categoria=self.categoria)
 
-def busquedaProductoNombre(request):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mostrar_hero'] = False
+        # Pasamos la categoría actual al contexto también
+        context['categoria_actual'] = self.categoria
+        return context
+
+class BuscarProductoListView(ListView):
     """ Vista para mostrar productos por nombre"""
-    nombre = request.GET.get('nombre', '').strip()
+    template_name = 'snippets/busqueda.html'
+    paginate_by = 12
+    context_object_name = 'productos'
     
-    listProductos = Producto.objects.filter(nombre__icontains=nombre)
-    listCategorias = Categoria.objects.all()
-
-    return render(request, 'snippets/busqueda.html',{
-        'productos': listProductos,
-        'categorias': listCategorias,
-        'nombre': nombre,
-        'mostrar_hero': False,
-    })
+    def get_queryset(self):
+        query = self.request.GET.get('nombre', '').strip()        
+        if query:
+            return Producto.objects.filter(nombre__icontains=query)
+        return Producto.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['nombre'] = self.request.GET.get('nombre', '')
+        context['mostrar_hero'] = False
+        return context
 
 class ProductoDetailView(DetailView):
     """ Vista para mostrar el detalle de un producto """
@@ -278,6 +288,7 @@ def confirmarPedido(request):
             fecha_pedido=fecha_actual,
             monto_total=monto_total
         )
+        nuevoPedido.calcular_total()
         nuevoPedido.save()
 
         # 5. Generamos el nro_pedido (usando el ID generado)

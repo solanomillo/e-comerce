@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container mt-3 mt-md-5">
   <div class="row g-3 g-md-4">
-    <!-- Product Images - Versión responsive -->
+    <!-- Columna Izquierda: Carrusel -->
     <div class="col-12 col-lg-6">
       <!-- Carousel principal -->
       <div id="productCarousel" class="carousel slide shadow-sm rounded-3" data-bs-ride="carousel">
@@ -37,27 +37,9 @@
           <span class="visually-hidden">Next</span>
         </button>
       </div>
-
-      <!-- Thumbnails - Ocultos en móviles -->
-      <div class="row mt-3 g-2 d-none d-md-flex">
-        <div class="col-6">
-          {% if producto.imagen %}
-          <img src="{{producto.imagen.url}}" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(0)">
-          {% else %}
-          <img src="https://via.placeholder.com/300x300" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(0)">
-          {% endif %}
-        </div>
-        <div class="col-6">
-          {% if producto.imagen %}
-          <img src="{{producto.imagen.url}}" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(1)">
-          {% else %}
-          <img src="https://via.placeholder.com/300x300" class="img-thumbnail w-100 cursor-pointer" alt="Thumbnail" onclick="$('#productCarousel').carousel(1)">
-          {% endif %}
-        </div>
-      </div>
     </div>
 
-    <!-- Product Details - Versión responsive -->
+    <!-- Columna Derecha: Información del Producto -->
     <div class="col-12 col-lg-6">
       <div class="card h-100 border-0 shadow-sm">
         <div class="card-body p-3 p-md-4">
@@ -99,7 +81,7 @@
               <i class="fas fa-shopping-cart me-2"></i> Agregar al Carrito
             </button>
             
-            <!-- Botón "Seguir Comprando" añadido aquí -->
+            <!-- Botón "Seguir Comprando" -->
             <a href="{% url 'web:index' %}" class="btn btn-outline-secondary w-100">
               <i class="fas fa-arrow-left me-2"></i> Seguir Comprando
             </a>
@@ -107,7 +89,7 @@
 
           <!-- Product Meta -->
           <div class="border-top pt-3">
-            <!-- Puedes agregar metadatos adicionales aquí -->
+            <!-- Aquí podés agregar metadatos adicionales -->
           </div>
         </div>
       </div>

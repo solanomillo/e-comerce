@@ -34,7 +34,8 @@ class PedidoDetalleInline(admin.TabularInline):  # o admin.StackedInline si pref
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    list_display = ('nro_pedido', 'cliente', 'estado', 'fecha_pedido', 'monto_total')
+    list_display = ('nro_pedido', 'cliente', 'estado', 'fecha_pedido', 'monto_total'
+                    )
     list_filter = ('estado', 'fecha_pedido')
     search_fields = ('nro_pedido', 'cliente__usuario__username')
     inlines = [PedidoDetalleInline]

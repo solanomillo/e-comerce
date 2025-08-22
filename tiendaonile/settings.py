@@ -33,7 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'web',
     'paypal.standard.ipn',
-    'jazzmin',    
+    'jazzmin',
+    'Codigo_promocion',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
