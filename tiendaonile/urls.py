@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('web.urls')),
     path('admin/', admin.site.urls),
     path('paypal/', include("paypal.standard.ipn.urls")),
+    path('codigo-promocion/', include('Codigo_promocion.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

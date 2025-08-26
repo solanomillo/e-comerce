@@ -2,10 +2,11 @@
 {% load number_filters %}
 {% block content %}
 <div class="container py-5">
+
     <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="display-5">Detalle de Pedido {{pedido.nro_pedido}}</h1>
-        <span class="badge bg-secondary fs-6">Fecha: {{pedido.fecha_pedido|date:"d/m/Y"}}</span>
+        <h1 class="display-5">Detalle de Pedido {{ pedido.nro_pedido }}</h1>
+        <span class="badge bg-secondary fs-6">Fecha: {{ pedido.fecha_pedido|date:"d/m/Y" }}</span>
     </div>
 
     <!-- Lista de productos -->
@@ -16,48 +17,31 @@
         <div class="card-body">
             {% for detalle in pedido.detalles.all %}
             <div class="row mb-4 border-bottom pb-3 align-items-center">
-                <!-- Imagen del producto -->
                 <div class="col-md-2">
-                    <img src="{{detalle.producto.imagen.url}}" alt="{{detalle.producto.nombre}}" class="img-fluid rounded">
+                    <img src="{{ detalle.producto.imagen.url }}" alt="{{ detalle.producto.nombre }}" class="img-fluid rounded">
                 </div>
-                
-                <!-- Información del producto -->
                 <div class="col-md-4">
-                    <span class="badge bg-light text-success mb-2">{{detalle.producto.categoria}}</span>
-                    <h3 class="h5">{{detalle.producto.nombre}}</h3>
+                    <span class="badge bg-light text-success mb-2">{{ detalle.producto.categoria }}</span>
+                    <h3 class="h5">{{ detalle.producto.nombre }}</h3>
                 </div>
-                
-                <!-- Precio unitario -->
                 <div class="col-md-2">
                     <p class="mb-1 text-muted">Precio unitario</p>
-                    <p class="h5 text-success">{{detalle.producto.precio|format_price}}</p>
+                    <p class="h5 text-success">{{ detalle.producto.precio|format_price }}</p>
                 </div>
-                
-                <!-- Cantidad -->
                 <div class="col-md-2">
                     <p class="mb-1 text-muted">Cantidad</p>
-                    <div class="input-group" style="max-width: 120px;">
-                        <button class="btn btn-outline-success" type="button">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <input type="text" class="form-control text-center" value="{{detalle.cantidad}}" readonly>
-                        <button class="btn btn-outline-success" type="button">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    <input type="text" class="form-control text-center" value="{{ detalle.cantidad }}" readonly>
                 </div>
-                
-                <!-- Subtotal -->
                 <div class="col-md-2">
                     <p class="mb-1 text-muted">Subtotal</p>
-                    <p class="h5 text-success">{{detalle.subtotal|format_price}}</p>
+                    <p class="h5 text-success">{{ detalle.subtotal|format_price }}</p>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Resumen y pago -->
+    <!-- Resumen del pedido -->
     <div class="row">
         <div class="col-md-6 offset-md-6">
             <div class="card">
@@ -65,29 +49,57 @@
                     <h2 class="h5 mb-0">Resumen del Pedido</h2>
                 </div>
                 <div class="card-body">
-                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="h5">Envio Total</h3>
-                        <h3 class="h4 text-success">{{pedido.envio_total|format_price}}</h3>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5>Subtotal productos</h5>
+                        <h5 class="text-success">{{ pedido.total_productos|format_price }}</h5>
                     </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5>Envío</h5>
+                        <h5 class="text-success">{{ pedido.envio_total|format_price }}</h5>
+                    </div>
+
+                    {% if pedido.promo_codigo %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 text-danger">
+                        <h5>Descuento ({{ pedido.promo_codigo.descuento|floatformat:"0"}}%)</h5>
+                        <h5>-{{ pedido.calcular_descuento|format_price }}</h5>
+                    </div>
+                    {% else %}
+                    <!-- Formulario para ingresar código promocional -->
+                    <div class="badge bg-warning text-wrap mb-2">Código Descuento</div>
+                    <form method="post" action="{% url 'codigo_promocion:aplicar_codigo' pedido.id %}">
+                        {% csrf_token %}
+                        {{ form_codigo.codigo }}
+                        <button type="submit" class="btn btn-outline-success mt-2">Aplicar</button>
+                        
+                    </form>
+                    <small class="text-muted">El Descuento se aplica sobre el subtotal de los productos no incluye el Envío.</small>
+                    {% endif %}
+
+                    <hr>
+
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="h5">Total</h3>
-                        <h3 class="h4 text-success">{{pedido.monto_total|format_price}}</h3>
+                        <h4>Total Final</h4>
+                        <h4 class="text-success">{{ pedido.total_final|format_price }}</h4>
                     </div>
-                    
-                    <!-- Botón de PayPal -->
-                    <div class="d-grid gap-2 mt-4">
-                        {{formPaypal.render}}
+
+                    <!-- Botón PayPal -->
+                    <div class="d-grid gap-2 mt-3">
+                        {{ formPaypal.render }}
                     </div>
-                    
-                    <!-- Botón de volver -->
+
+                    <!-- Botón Volver -->
                     <div class="d-grid mt-3">
                         <a href="/" class="btn btn-outline-success">
                             <i class="fas fa-arrow-left me-2"></i> Volver al inicio
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

@@ -1,6 +1,8 @@
 import datetime
+from decimal import Decimal
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
+from Codigo_promocion.forms import AplicarCodigoForm
 from .models import Cliente, Producto, Categoria, Pedido, PedidoDetalle
 from .carts import Cart
 from django.contrib.auth.models import User
@@ -262,78 +264,89 @@ def registrarPedido(request):
 """"Vista del método de pago"""
 @login_required(login_url='/login/')
 def confirmarPedido(request):
+    # POST: crear pedido
     if request.method == 'POST':
-        # 1. Actualizamos el usuario
-        actUsuario = User.objects.get(pk=request.user.id)
-        actUsuario.first_name = request.POST['nombre']
-        actUsuario.last_name = request.POST['apellido']
+        actUsuario = request.user
+        actUsuario.first_name = request.POST.get('nombre', '')
+        actUsuario.last_name = request.POST.get('apellido', '')
         actUsuario.save()
-        
-        # 2. Actualizamos el cliente
-        actCliente = Cliente.objects.get(usuario=request.user)       
-        actCliente.provincia = request.POST['provincia']
-        actCliente.localidad = request.POST['localidad']
-        actCliente.codigo_postal = request.POST['codigo_postal']
-        actCliente.direccion = request.POST['direccion']
+
+        actCliente = get_object_or_404(Cliente, usuario=actUsuario)
+        actCliente.provincia = request.POST.get('provincia', '')
+        actCliente.localidad = request.POST.get('localidad', '')
+        actCliente.codigo_postal = request.POST.get('codigo_postal', '')
+        actCliente.direccion = request.POST.get('direccion', '')
         actCliente.save()
-        
-        # 3. Datos del carrito y total
-        cart = request.session.get('cart')
-        monto_total = float(request.session.get('cartMontoTotal', 0))
 
-        # 4. Creamos el pedido con todo completo ANTES de guardar
+        cart = request.session.get('cart', {})
+        monto_total = Decimal(str(request.session.get('cartMontoTotal', '0')))
+
         fecha_actual = datetime.datetime.now()
-        nuevoPedido = Pedido(
-            cliente=actCliente,
-            fecha_pedido=fecha_actual,
-            monto_total=monto_total
-        )
-        nuevoPedido.calcular_total()
-        nuevoPedido.save()
+        pedido = Pedido(cliente=actCliente, fecha_pedido=fecha_actual, monto_total=monto_total)
+        pedido.save()
 
-        # 5. Generamos el nro_pedido (usando el ID generado)
-        nro_pedido = f'PED-{fecha_actual.strftime("%Y")}{nuevoPedido.id:05d}'
-        nuevoPedido.nro_pedido = nro_pedido
-        nuevoPedido.save()
-        
-        # registrar la variable de session para el pedido
-        request.session['pedidoId'] = nuevoPedido.id
+        # Generar nro_pedido
+        pedido.nro_pedido = f'PED-{fecha_actual.strftime("%Y")}{pedido.id:05d}'
+        pedido.save()
 
-        # 6. Registramos los detalles del pedido
+        request.session['pedidoId'] = pedido.id
+
+        # Guardar detalles
         for key, value in cart.items():
-            producto = Producto.objects.get(pk=value['producto_id'])
+            producto = get_object_or_404(Producto, pk=value['producto_id'])
             detalle = PedidoDetalle(
-                pedido=nuevoPedido,
+                pedido=pedido,
                 producto=producto,
                 cantidad=int(value['cantidad']),
-                subtotal=float(value['subtotal'])
+                subtotal=Decimal(str(value['subtotal']))
             )
             detalle.save()
-        
-        # 7. Configuramos PayPal
-        paypal_dict = {
+
+        # PayPal
+        formPaypal = PayPalPaymentsForm(initial={
             "business": "sb-ii8ew38425031@business.example.com",
-            "amount": monto_total,
-            "item_name": f'Pedido {nuevoPedido.nro_pedido} - {nuevoPedido.cliente.usuario.username}',
-            "invoice": nro_pedido,
+            "amount": float(pedido.total_final()),
+            "item_name": f'Pedido {pedido.nro_pedido} - {pedido.cliente.usuario.username}',
+            "invoice": pedido.nro_pedido,
             "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
             "return": request.build_absolute_uri('/gracias'),
             "cancel_return": request.build_absolute_uri('/'),
             "custom": "premium_plan",
-        }
-        formPaypal = PayPalPaymentsForm(initial=paypal_dict)
-        
-        # limpiar el carrito después de crear el pedido
+        })
+
+        # Limpiar carrito
         carrito = Cart(request)
         carrito.clear()
 
         return render(request, 'compra.html', {
-            'pedido': nuevoPedido,
+            'pedido': pedido,
             'formPaypal': formPaypal,
-        })   
+            'form_codigo': AplicarCodigoForm()
+        })
 
-    # Si no es POST, redirigimos o mostramos un error
-    return render(request, 'compra.html')
+    # GET: mostrar pedido existente
+    pedido_id = request.session.get('pedidoId')
+    if pedido_id:
+        pedido = get_object_or_404(Pedido, id=pedido_id)
+        formPaypal = PayPalPaymentsForm(initial={
+            "business": "sb-ii8ew38425031@business.example.com",
+            "amount": float(pedido.total_final()),
+            "item_name": f'Pedido {pedido.nro_pedido} - {pedido.cliente.usuario.username}',
+            "invoice": pedido.nro_pedido,
+            "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+            "return": request.build_absolute_uri('/gracias'),
+            "cancel_return": request.build_absolute_uri('/'),
+            "custom": "premium_plan",
+        })
+        return render(request, 'compra.html', {
+            'pedido': pedido,
+            'formPaypal': formPaypal,
+            'form_codigo': AplicarCodigoForm()
+        })
+
+    return redirect('/')
+
+
 
 @login_required(login_url='/login/')
 def gracias(request):

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from autoslug import AutoSlugField
+import decimal
+from Codigo_promocion.models import PromoCodigo
 
 # Create your models here.
 class Categoria(models.Model):
@@ -49,12 +51,33 @@ class Pedido(models.Model):
     monto_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     envio_total = models.DecimalField(max_digits=10, decimal_places=2, default=20000.00)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='Pendiente')
+    promo_codigo = models.OneToOneField(PromoCodigo, on_delete=models.RESTRICT, null=True, blank=True)
 
-    def calcular_total(self):
-        self.monto_total = self.monto_total + self.envio_total
-
+    
     def __str__(self):
         return f'Pedido {self.id} - {self.cliente.usuario.username}'
+
+    # --- Métodos de cálculo ---
+    def total_productos(self):
+        """Retorna la suma de los subtotales de los detalles"""
+        total = decimal.Decimal('0.00')
+        for detalle in self.detalles.all():
+            total += decimal.Decimal(detalle.subtotal)
+        return total
+
+    def calcular_descuento(self):
+        """Calcula el descuento según el código promocional"""
+        if self.promo_codigo:
+            return (self.total_productos() * decimal.Decimal(self.promo_codigo.descuento)) / decimal.Decimal('100')
+        return decimal.Decimal('0.00')
+
+    def total_con_envio(self):
+        """Suma productos + envío sin aplicar descuento"""
+        return self.total_productos() + decimal.Decimal(str(self.envio_total))
+
+    def total_final(self):
+        """Suma productos + envío - descuento"""
+        return self.total_con_envio() - self.calcular_descuento()
     
  
 class PedidoDetalle(models.Model):
