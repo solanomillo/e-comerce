@@ -32,3 +32,4 @@ def aplicar_codigo(request, pedido_id):
             return redirect('web:confirmar_pedido')
 
     return redirect('web:confirmar_pedido')
+

@@ -4,3 +4,4 @@ mysqlclient
 django-jazzmin
 django-paypal
 django-autoslug
+python-decouple

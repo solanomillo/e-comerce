@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from decouple import config
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-mc8uz$^+-*2!-5-r2mvm5jl2d0_xg!vpz4d*zd$8rzt(&yoy)^'
+SECRET_KEY = config('SECRET_KEY', default='unsafe-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [config('ALLOWED_HOSTS', default='')]
 
 
 # Application definition
@@ -103,11 +104,11 @@ WSGI_APPLICATION = 'tiendaonile.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Tiendaonline',
-        'USER': 'julio',
-        'PASSWORD': 'riverplate',
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USER'),
+        'PASSWORD': config('DATABASE_PASSWORD'),
+        'HOST': config('DATABASE_HOST', default='127.0.0.1'),
+        'PORT': config('DATABASE_PORT', default='3306'),
     }
 }
 
@@ -147,6 +148,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # Default primary key field type
@@ -158,4 +160,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 MEDIA_URL = '/media/'
 
-PAYPAL_TEST = True
+PAYPAL_TEST = config('PAYPAL_TEST', default=True, cast=bool)
+PAYPAL_USER_EMAIL = config('PAYPAL_USER_EMAIL', default='')

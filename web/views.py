@@ -14,6 +14,7 @@ from django.urls import reverse
 from paypal.standard.forms import PayPalPaymentsForm
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.conf import settings
 
 
 # Create your views here.
@@ -304,7 +305,7 @@ def confirmarPedido(request):
 
         # PayPal
         formPaypal = PayPalPaymentsForm(initial={
-            "business": "sb-ii8ew38425031@business.example.com",
+            "business": settings.PAYPAL_USER_EMAIL,
             "amount": float(pedido.total_final()),
             "item_name": f'Pedido {pedido.nro_pedido} - {pedido.cliente.usuario.username}',
             "invoice": pedido.nro_pedido,
@@ -329,7 +330,7 @@ def confirmarPedido(request):
     if pedido_id:
         pedido = get_object_or_404(Pedido, id=pedido_id)
         formPaypal = PayPalPaymentsForm(initial={
-            "business": "sb-ii8ew38425031@business.example.com",
+            "business": settings.PAYPAL_USER_EMAIL,
             "amount": float(pedido.total_final()),
             "item_name": f'Pedido {pedido.nro_pedido} - {pedido.cliente.usuario.username}',
             "invoice": pedido.nro_pedido,
