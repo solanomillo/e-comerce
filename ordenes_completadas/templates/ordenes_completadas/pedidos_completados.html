@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">📦 Órdenes Completadas</h2>
+
+    {% if pedidos %}
+        <!-- Botón toggle -->
+        <div class="text-center mb-4">
+            <button class="btn btn-success me-2" id="btnCards">🖼 Ver como Cards</button>
+            <button class="btn btn-outline-success" id="btnTable">📋 Ver como Tabla</button>
+        </div>
+
+        <!-- Vista en Cards -->
+        <div id="cardsView" class="row g-4">
+            {% for pedido in pedidos %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100 border-success">
+                        <div class="card-header bg-success text-white">
+                            <strong>Pedido #{{ pedido.nro_pedido }}</strong><br>
+                            <small>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                Cliente: {{ pedido.cliente.usuario.username }}
+                            </h6>
+
+                            <h6 class="mt-3">🛒 Productos</h6>
+                            <ul class="list-unstyled">
+                                {% for detalle in pedido.detalles.all %}
+                                    <li class="d-flex align-items-center mb-2">
+                                        {% if detalle.producto.imagen %}
+                                            <img src="{{ detalle.producto.imagen.url }}" 
+                                                 alt="{{ detalle.producto.nombre }}" 
+                                                 class="img-thumbnail me-2"
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="{% static 'img/no-image.png' %}" 
+                                                 alt="Sin imagen" 
+                                                 class="img-thumbnail me-2"
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% endif %}
+                                        <span>
+                                            {{ detalle.producto.nombre }} 
+                                            (x{{ detalle.cantidad }}) 
+                                            - ${{ detalle.subtotal }}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <hr>
+                            <p class="mb-1">Subtotal: ${{ pedido.total_productos }}</p>
+                            <p class="mb-1">Envío: ${{ pedido.envio_total }}</p>
+                            <p class="fw-bold text-success">Total Final: ${{ pedido.total_final }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Vista en Tabla (oculta al inicio) -->
+        <div id="tableView" class="table-responsive shadow rounded d-none mt-4">
+            <table class="table table-striped align-middle">
+                <thead class="table-success">
+                    <tr>
+                        <th>N° Pedido</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Productos</th>
+                        <th>Monto Total</th>
+                        <th>Envío</th>
+                        <th>Total Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                        <tr>
+                            <td>{{ pedido.nro_pedido }}</td>
+                            <td>{{ pedido.cliente.usuario.username }}</td>
+                            <td>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <ul class="list-unstyled mb-0">
+                                    {% for detalle in pedido.detalles.all %}
+                                        <li>
+                                            {% if detalle.producto.imagen %}
+                                                <img src="{{ detalle.producto.imagen.url }}" 
+                                                     alt="{{ detalle.producto.nombre }}" 
+                                                     style="width: 30px; height: 30px; object-fit: cover; border-radius: 5px; margin-right: 5px;">
+                                            {% else %}
+                                                <img src="{% static 'img/no-image.png' %}" 
+                                                     alt="Sin imagen" 
+                                                     style="width: 30px; height: 30px; object-fit: cover; border-radius: 5px; margin-right: 5px;">
+                                            {% endif %}
+                                            {{ detalle.producto.nombre }} (x{{ detalle.cantidad }}) - ${{ detalle.subtotal }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>${{ pedido.total_productos }}</td>
+                            <td>${{ pedido.envio_total }}</td>
+                            <td><strong class="text-success">${{ pedido.total_final }}</strong></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 🔹 Paginación -->
+        <nav aria-label="Paginación" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if pedidos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link text-success" href="?page={{ pedidos.previous_page_number }}">Anterior</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+                {% endif %}
+
+                {% for num in pedidos.paginator.page_range %}
+                    {% if pedidos.number == num %}
+                        <li class="page-item active"><span class="page-link bg-success border-success">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link text-success" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pedidos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link text-success" href="?page={{ pedidos.next_page_number }}">Siguiente</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+    {% else %}
+        <div class="alert alert-info text-center">
+            No hay pedidos completados aún.
+        </div>
+    {% endif %}
+</div>
+
+<!-- Script toggle -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const btnCards = document.getElementById("btnCards");
+    const btnTable = document.getElementById("btnTable");
+    const cardsView = document.getElementById("cardsView");
+    const tableView = document.getElementById("tableView");
+
+    btnCards.addEventListener("click", function() {
+        cardsView.classList.remove("d-none");
+        tableView.classList.add("d-none");
+    });
+
+    btnTable.addEventListener("click", function() {
+        tableView.classList.remove("d-none");
+        cardsView.classList.add("d-none");
+    });
+});
+</script>
+{% endblock %}
