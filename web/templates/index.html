@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
   {% if mostrar_hero %}
     <div class="hero-section text-center">
-      <h1 class="display-4 fw-bold">Bienvenido a nuestra tienda</h1>
-      <p class="lead">Los mejores productos al mejor precio</p>
-      <a href="#seccion-inferior" class="btn btn-primary btn-lg">Ver más</a>
+      <img src="{% static 'img/cuatro.png' %}" alt="Hero" class="hero-img">
+      <div class="hero-content">
+        <h1 class="display-4 fw-bold">Bienvenido a Cuatro Estaciones</h1>
+        <p class="lead">Los mejores productos al mejor precio</p>
+        <a href="#seccion-inferior" class="btn btn-success btn-lg">Ver más</a>
+      </div>
     </div>
   {% endif %}
 
@@ -13,4 +17,3 @@
     {% include 'snippets/listaProducto.html' %}
   </div>
 {% endblock %}
-

@@ -49,7 +49,7 @@ class Pedido(models.Model):
     fecha_pedido = models.DateTimeField(auto_now_add=True)
     nro_pedido = models.CharField(max_length=20, unique=True)
     monto_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    envio_total = models.DecimalField(max_digits=10, decimal_places=2, default=20000.00)
+    envio_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='Pendiente')
     promo_codigo = models.OneToOneField(PromoCodigo, on_delete=models.RESTRICT, null=True, blank=True)
 

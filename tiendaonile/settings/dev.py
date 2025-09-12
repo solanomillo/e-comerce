@@ -14,8 +14,10 @@ from decouple import config
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# Media File
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -48,9 +50,9 @@ INSTALLED_APPS = [
 JAZZMIN_SETTINGS = {
     "site_title": "E-commerce Admin",
     "site_header": "Panel de Administración",
-    "site_brand": "Moda Urbana",
+    "site_brand": "Cuatro Estaciones",
     "welcome_sign": "Bienvenido al panel de tu e-commerce",
-    "copyright": "Moda Urbana",
+    "copyright": "Cuatro Estaciones",
     "search_model": "productos.Producto",  # app.model a buscar desde barra superior
 
     "show_sidebar": True,
@@ -149,16 +151,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Media File
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
-MEDIA_URL = '/media/'
+
 
 PAYPAL_TEST = config('PAYPAL_TEST', default=True, cast=bool)
 PAYPAL_USER_EMAIL = config('PAYPAL_USER_EMAIL', default='')

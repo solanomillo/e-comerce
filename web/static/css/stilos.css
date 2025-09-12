@@ -69,21 +69,54 @@ main {
 /* Hero section corregida */
 .hero-section {
   width: 100%;
-  height: 100vh;
-  max-height: 800px; /* Altura máxima para evitar que sea demasiado alto en pantallas grandes */
-  background: url("/static/img/fondo.jpg") no-repeat center center;
-  background-size: cover;
+  height: 100vh;       /* Altura completa de pantalla */
+  max-height: 500px;   /* Altura máxima */
+  position: relative;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
   color: white;
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  position: relative;
 }
+
+.hero-img {
+  position: absolute;  /* La imagen detrás del texto */
+  top: 0;
+  left: 0;
+  width: 100%;         /* Ocupa todo el ancho */
+  height: 100%;        /* Ocupa toda la altura del hero */
+  object-fit: cover;   /* Ajusta la imagen recortando si es necesario */
+  z-index: 0;          /* Detrás del contenido */
+}
+
+.hero-content {
+  position: relative;  /* Para que quede sobre la imagen */
+  z-index: 1;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+}
+
+
+.destacados-title {
+  position: relative;
+  display: inline-block;
+  color: #28a745;
+  font-weight: bold;
+  font-size: 2.2rem;
+}
+
+.destacados-title::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 4px;
+  background-color: #28a745;
+  left: 25%;
+  bottom: -10px;
+  border-radius: 2px;
+}
+
+
+
 
 /* Ajustes para dispositivos móviles */
 @media (max-width: 768px) {
