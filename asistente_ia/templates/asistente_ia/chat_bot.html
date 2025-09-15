@@ -1,0 +1,31 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'asistente_ia/chatbot.css' %}">
+
+<div id="chat-widget" class="chat-widget" aria-live="polite">
+  <!-- Botón (burbuja) -->
+  <button id="chat-toggle" class="chat-toggle" aria-label="Abrir chat">
+    <img src="{% static 'asistente_ia/logo2.jpg' %}" alt="Tic" class="chat-logo">
+  </button>
+
+  <!-- Panel del chat (oculto por defecto) -->
+  <div id="chat-panel" class="chat-panel" hidden>
+    <div class="chat-header">
+      <img src="{% static 'asistente_ia/logo2.jpg' %}" alt="Tic" class="chat-logo-small">
+      <div class="chat-title">Tic — Asistente de compra</div>
+      <button id="chat-close" class="chat-close" aria-label="Cerrar chat">&times;</button>
+    </div>
+
+    <div id="chat-messages" class="chat-messages" role="log" aria-live="polite"></div>
+
+    <div class="chat-input-area">
+      <input id="chat-input" class="chat-input" type="text" placeholder="Escribe tu pregunta..." aria-label="Mensaje">
+      <button id="chat-send" class="chat-send">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'asistente_ia/chatbot.js' %}"></script>
+<!--
+  Este es un widget de chat simple para un asistente de compra en línea.
+  Incluye un botón flotante que abre un panel de chat donde los usuarios pueden interactuar con el asistente.
+  El diseño es responsivo y accesible, con roles ARIA para mejorar la experiencia del usuario.

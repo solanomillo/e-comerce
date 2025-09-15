@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from decouple import config
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     'jazzmin',
     'Codigo_promocion',
     'ordenes_completadas',
+    'asistente_ia',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -162,3 +167,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PAYPAL_TEST = config('PAYPAL_TEST', default=True, cast=bool)
 PAYPAL_USER_EMAIL = config('PAYPAL_USER_EMAIL', default='')
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODELO_FLASH = os.getenv("GEMINI_MODELO_FLASH")

@@ -25,4 +25,5 @@ urlpatterns = [
     path('paypal/', include("paypal.standard.ipn.urls")),
     path('codigo-promocion/', include('Codigo_promocion.urls')),
     path('ordenes-completadas/', include('ordenes_completadas.urls')),
+    path("chat/", include("asistente_ia.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'paypal.standard.ipn',
     'jazzmin',
     'Codigo_promocion',
+    'asistente_ia',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
